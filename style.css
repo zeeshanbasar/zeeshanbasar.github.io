@@ -13,11 +13,13 @@ li.lavender-webring-curr-site > a {
 }
 
 #site_header {
-  padding-bottom: 5px;
+  /* padding-bottom: 0px; */
   border-bottom: 1px solid rgb(255, 0, 140);
   border-spacing: inherit;
   text-align: center;
   position: relative;
+  top: -20px;
+  height: 350px;
 }
 
 footer {
@@ -33,12 +35,12 @@ footer,
 
 #header_name{
     position: relative;
-    top: -75px;
+    top: -100px;
 }
 
 #banner{
     position: relative;
-    top: -75px;
+    top: -100px;
     /* left: 20px; */
     /* background-color: white; */
     /* width: 500px; */
@@ -76,6 +78,11 @@ time,
 
 img {
   max-width: 100%;
+  margin-left: -100px;
+  margin-right: inherit;
+  margin-top: 20px;
+  /* padding-top: 2em; */
+  /* padding-bottom: 2em; */
 }
 
 .tag {
