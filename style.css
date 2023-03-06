@@ -41,6 +41,8 @@ footer,
 #banner{
     position: relative;
     top: -100px;
+    margin-left: auto;
+    margin-right: auto;
     /* left: 20px; */
     /* background-color: white; */
     /* width: 500px; */
@@ -54,6 +56,14 @@ footer,
   margin-right: auto;
   padding-top: 2em;
   padding-bottom: 2em;
+}
+
+#intro_content {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  /* padding-top: 2em; */
+  /* padding-bottom: 2em; */
 }
 
 .byline {
@@ -87,6 +97,11 @@ img {
 
 .tag {
   font-weight: bold;
+}
+
+#dedicate{
+    max-width: 2%;
+    position: absolute;
 }
 
 /* .lavender-webring-container {
