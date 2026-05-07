@@ -3,42 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TASKCTL</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <title>tasks // zee</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
   <style>
+    /* ── SITE TOKENS (mirrors style.css) ── */
     :root {
-      --bg:      #0c0e14;
-      --bg2:     #13161f;
-      --bg3:     #1a1d28;
-      --border:  #252836;
-      --border2: #333649;
-      --text:    #e8eaf0;
-      --text2:   #8b8fa8;
-      --text3:   #565a72;
-      --accent:  #00d4aa;
-      --accent2: #00a882;
-      --red:     #ff4d6d;
-      --orange:  #ff9040;
-      --yellow:  #ffd166;
-      --green:   #06d6a0;
-      --blue:    #4895ef;
-      --purple:  #9b72cf;
-      --radius:  8px;
-      --mono:    'IBM Plex Mono', monospace;
-      --sans:    'IBM Plex Sans', sans-serif;
+      --bg:          rgb(236, 169, 203);
+      --text:        rgb(92,  53,  124);
+      --pink:        rgb(255, 0,   140);
+      --purple:      rgb(195, 0,   255);
+      --border-pink: rgb(255, 0,   140);
+      --border-dot:  rgb(219, 103, 167);
+      --white:       #fff;
+      --card-bg:     rgba(255,255,255,0.72);
+      --card-hover:  rgba(255,255,255,0.92);
+      --muted:       rgba(92,53,124,0.55);
+
+      /* priority strip colors — readable on pink bg */
+      --p-urgent: #c0003a;
+      --p-high:   rgb(255,0,140);
+      --p-medium: rgb(92,53,124);
+      --p-low:    rgb(150,0,200);
+
+      --radius: 5px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    html { background-color: var(--bg); color: var(--text); }
+
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--sans);
+      font-family: Georgia, 'Times New Roman', serif;
       min-height: 100vh;
       overflow-x: hidden;
     }
+
+    a { color: var(--pink); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    a.active { color: var(--purple); }
 
     /* ── OVERLAY ── */
     .overlay {
@@ -50,42 +52,40 @@
     .overlay.hidden { display: none; }
 
     .auth-box {
-      background: var(--bg2);
-      border: 1px solid var(--border2);
-      border-radius: 14px;
-      padding: 48px;
+      background: var(--white);
+      border: 2px solid var(--border-pink);
+      border-radius: var(--radius);
+      padding: 40px 44px;
       width: 420px;
       max-width: 92vw;
-      animation: popIn 0.3s cubic-bezier(.34,1.56,.64,1) both;
+      box-shadow: 4px 4px 0 var(--border-dot);
+      animation: popIn 0.25s ease both;
     }
 
     .auth-logo {
-      font-family: var(--mono);
-      font-size: 22px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      color: var(--accent);
-      margin-bottom: 6px;
+      font-size: 1.35rem;
+      font-weight: bold;
+      color: var(--text);
+      margin-bottom: 4px;
     }
-    .auth-logo span { color: var(--text3); }
+    .auth-logo span { color: var(--pink); }
     .auth-sub {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text3);
-      margin-bottom: 38px;
-      letter-spacing: 0.08em;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 28px;
+      font-style: italic;
     }
 
     /* ── INPUTS ── */
-    .field { margin-bottom: 18px; }
+    .field { margin-bottom: 16px; }
     .lbl {
       display: block;
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.14em;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--text3);
-      margin-bottom: 8px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-family: monospace;
     }
 
     input[type="password"],
@@ -94,361 +94,324 @@
     textarea,
     select {
       width: 100%;
-      background: var(--bg3);
-      border: 1px solid var(--border2);
+      background: rgba(236,169,203,0.2);
+      border: 1px solid var(--border-dot);
       border-radius: var(--radius);
       color: var(--text);
-      font-family: var(--mono);
-      font-size: 13px;
-      padding: 11px 14px;
+      font-family: Georgia, serif;
+      font-size: 0.9rem;
+      padding: 9px 12px;
       outline: none;
       transition: border-color 0.2s;
       appearance: none;
     }
-    input:focus, textarea:focus, select:focus { border-color: var(--accent); }
-    ::placeholder { color: var(--text3); }
-    select option { background: var(--bg3); }
-    textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
+    input:focus, textarea:focus, select:focus { border-color: var(--pink); }
+    ::placeholder { color: var(--muted); }
+    select option { background: var(--white); color: var(--text); }
+    textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
 
     /* ── BUTTONS ── */
     .btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 11px 20px;
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 18px;
       border-radius: var(--radius);
-      font-family: var(--mono);
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.06em;
+      font-family: Georgia, serif;
+      font-size: 0.85rem;
       cursor: pointer;
       border: none;
       transition: all 0.15s;
     }
     .btn-primary {
-      background: var(--accent); color: #000;
+      background: var(--pink); color: #fff;
       width: 100%; justify-content: center;
+      border: 2px solid var(--pink);
     }
-    .btn-primary:hover { background: var(--accent2); }
+    .btn-primary:hover { background: var(--purple); border-color: var(--purple); text-decoration: none; }
     .btn-ghost {
-      background: transparent;
-      color: var(--text2);
-      border: 1px solid var(--border2);
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border-dot);
     }
-    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-ghost:hover { border-color: var(--pink); color: var(--pink); }
     .btn-danger {
-      background: transparent;
-      color: var(--red);
-      border: 1px solid color-mix(in srgb, var(--red) 40%, transparent);
+      background: transparent; color: var(--p-urgent);
+      border: 1px solid var(--p-urgent);
     }
-    .btn-danger:hover { background: var(--red); color: #fff; }
-    .btn-sm { padding: 6px 12px; font-size: 11px; }
+    .btn-danger:hover { background: var(--p-urgent); color: #fff; }
+    .btn-sm { padding: 5px 11px; font-size: 0.78rem; }
 
     .err {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--red);
-      min-height: 18px;
-      margin-top: 10px;
+      font-family: monospace;
+      font-size: 0.73rem;
+      color: var(--p-urgent);
+      min-height: 16px;
+      margin-top: 8px;
     }
 
-    /* ── HEADER ── */
-    header {
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border);
-      height: 54px;
-      padding: 0 24px;
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; z-index: 100;
+    /* ── SITE HEADER (mirrors index.html) ── */
+    #site_header {
+      border-bottom: 1px solid var(--border-pink);
+      text-align: center;
+      padding: 20px 0 14px;
     }
-    .logo {
-      font-family: var(--mono);
-      font-weight: 600;
-      font-size: 15px;
-      color: var(--accent);
-      letter-spacing: 0.12em;
+    #site_header h1 {
+      color: var(--text);
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      position: relative;
+      top: 0;
     }
-    .logo span { color: var(--text3); }
-    .hdr-right { display: flex; align-items: center; gap: 10px; }
+    #site_header nav span { margin: 0 3px; }
+
+    /* ── PAGE TOOLBAR ── */
+    .toolbar {
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 10px;
+      padding: 12px 24px;
+      border-bottom: 1px dotted var(--border-dot);
+      background: rgba(255,255,255,0.25);
+    }
     .sync-badge {
       display: flex; align-items: center; gap: 6px;
-      font-family: var(--mono); font-size: 11px; color: var(--text3);
+      font-size: 0.73rem; font-family: monospace; color: var(--muted);
     }
     .sdot {
       width: 6px; height: 6px; border-radius: 50%;
-      background: var(--green); flex-shrink: 0;
+      background: #1aad6e; flex-shrink: 0;
     }
-    .sdot.syncing { background: var(--yellow); animation: pulse 1s infinite; }
-    .sdot.error   { background: var(--red); }
+    .sdot.syncing { background: #b07800; animation: pulse 1s infinite; }
+    .sdot.error   { background: var(--p-urgent); }
 
     /* ── MAIN ── */
-    main { padding: 24px; max-width: 1440px; margin: 0 auto; }
+    main { padding: 18px 24px 48px; max-width: 1400px; margin: 0 auto; }
 
     .board-hdr {
       display: flex; align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap; gap: 14px;
-      margin-bottom: 22px;
+      justify-content: space-between; flex-wrap: wrap; gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px dotted var(--border-dot);
     }
-    .controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .filter-box {
-      background: var(--bg2);
-      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.55);
+      border: 1px solid var(--border-dot);
       border-radius: var(--radius);
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: 12px;
-      padding: 8px 14px;
-      width: 190px;
-      outline: none;
-      transition: border-color 0.2s;
+      color: var(--text); font-family: Georgia, serif;
+      font-size: 0.82rem; padding: 7px 12px; width: 180px; outline: none;
     }
-    .filter-box:focus { border-color: var(--accent); }
+    .filter-box:focus { border-color: var(--pink); }
+    .filter-box::placeholder { color: var(--muted); }
     .filter-sel {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--text2);
-      font-family: var(--mono);
-      font-size: 11px;
-      padding: 8px 12px;
-      outline: none;
-      cursor: pointer;
+      background: rgba(255,255,255,0.55);
+      border: 1px solid var(--border-dot); border-radius: var(--radius);
+      color: var(--text); font-family: Georgia, serif;
+      font-size: 0.78rem; padding: 7px 10px; outline: none; cursor: pointer;
     }
 
     /* ── BOARD ── */
     .board {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-      align-items: start;
+      gap: 16px; align-items: start;
     }
-    @media (max-width: 860px) { .board { grid-template-columns: 1fr; } }
+    @media (max-width: 800px) { .board { grid-template-columns: 1fr; } }
 
     .column {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
+      background: rgba(255,255,255,0.35);
+      border: 1px solid var(--border-dot);
+      border-radius: var(--radius); overflow: hidden;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
     .column.drag-over {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
+      border-color: var(--pink);
+      box-shadow: 3px 3px 0 var(--border-dot);
     }
 
     .col-hdr {
-      padding: 13px 16px;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg3);
+      padding: 10px 14px;
+      border-bottom: 1px dotted var(--border-dot);
+      background: rgba(255,255,255,0.45);
       display: flex; align-items: center; justify-content: space-between;
     }
     .col-title {
-      font-family: var(--mono);
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      display: flex; align-items: center; gap: 8px;
+      font-size: 0.7rem; font-weight: bold;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--text); display: flex; align-items: center; gap: 7px;
+      font-family: monospace;
     }
-    .col-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .col-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
     .col-count {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text3);
-      background: var(--bg);
-      padding: 2px 9px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
+      font-family: monospace; font-size: 0.7rem; color: var(--muted);
+      background: rgba(255,255,255,0.6); padding: 1px 8px;
+      border-radius: 10px; border: 1px solid var(--border-dot);
     }
     .col-body {
-      padding: 12px;
-      min-height: 180px;
-      display: flex; flex-direction: column; gap: 10px;
+      padding: 10px; min-height: 160px;
+      display: flex; flex-direction: column; gap: 9px;
     }
 
     /* ── CARD ── */
     .card {
-      background: var(--bg3);
-      border: 1px solid var(--border);
+      background: var(--card-bg);
+      border: 1px solid var(--border-dot);
       border-left: 3px solid transparent;
-      border-radius: var(--radius);
-      padding: 14px;
+      border-radius: var(--radius); padding: 12px;
       cursor: grab;
-      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
-      animation: popIn 0.2s ease both;
+      transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+      animation: popIn 0.18s ease both;
     }
     .card:hover {
-      border-color: var(--border2);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 20px rgba(0,0,0,.4);
+      background: var(--card-hover);
+      transform: translateY(-1px);
+      box-shadow: 2px 3px 0 var(--border-dot);
     }
-    .card:active { cursor: grabbing; opacity: 0.75; }
+    .card:active { cursor: grabbing; opacity: 0.8; }
 
-    .card.p-urgent { border-left-color: var(--red); }
-    .card.p-high   { border-left-color: var(--orange); }
-    .card.p-medium { border-left-color: var(--yellow); }
-    .card.p-low    { border-left-color: var(--blue); }
+    .card.p-urgent { border-left-color: var(--p-urgent); }
+    .card.p-high   { border-left-color: var(--p-high); }
+    .card.p-medium { border-left-color: var(--p-medium); }
+    .card.p-low    { border-left-color: var(--p-low); }
 
-    .card-title { font-size: 13.5px; font-weight: 500; line-height: 1.45; margin-bottom: 10px; }
+    .card-title { font-size: 0.88rem; line-height: 1.45; margin-bottom: 9px; color: var(--text); }
 
-    .card-meta {
-      display: flex; flex-wrap: wrap; gap: 5px;
-      align-items: center; margin-bottom: 10px;
-    }
+    .card-meta { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-bottom: 9px; }
+
     .badge {
-      font-family: var(--mono);
-      font-size: 9px; font-weight: 600;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      padding: 2px 8px; border-radius: 4px;
+      font-family: monospace; font-size: 0.63rem; font-weight: bold;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 2px 7px; border-radius: 3px;
     }
-    .badge.urgent { background: rgba(255,77,109,.14); color: var(--red); }
-    .badge.high   { background: rgba(255,144,64,.14); color: var(--orange); }
-    .badge.medium { background: rgba(255,209,102,.14); color: var(--yellow); }
-    .badge.low    { background: rgba(72,149,239,.14);  color: var(--blue); }
+    .badge.urgent { background: rgba(192,0,58,.1);  color: var(--p-urgent); border: 1px solid rgba(192,0,58,.25); }
+    .badge.high   { background: rgba(255,0,140,.1); color: var(--p-high);   border: 1px solid rgba(255,0,140,.25); }
+    .badge.medium { background: rgba(92,53,124,.1); color: var(--p-medium); border: 1px solid rgba(92,53,124,.25); }
+    .badge.low    { background: rgba(150,0,200,.1); color: var(--p-low);    border: 1px solid rgba(150,0,200,.25); }
 
     .tag {
-      font-family: var(--mono);
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 4px;
-      background: rgba(155,114,207,.13);
-      color: var(--purple);
+      font-family: monospace; font-size: 0.65rem;
+      padding: 2px 7px; border-radius: 3px;
+      background: rgba(255,0,140,.07); color: var(--pink);
+      border: 1px solid rgba(255,0,140,.22);
     }
-    .due {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--text3);
-      margin-left: auto;
-    }
-    .due.overdue { color: var(--red); }
-    .due.soon    { color: var(--yellow); }
+    .due { font-family: monospace; font-size: 0.65rem; color: var(--muted); margin-left: auto; }
+    .due.overdue { color: var(--p-urgent); font-weight: bold; }
+    .due.soon    { color: #7a4a00; }
 
-    .card-foot {
-      display: flex; align-items: center;
-      justify-content: flex-end; gap: 6px;
-    }
+    .card-foot { display: flex; align-items: center; justify-content: flex-end; gap: 5px; }
     .card-foot .spacer { flex: 1; }
-    .notes-hint {
-      font-family: var(--mono); font-size: 10px; color: var(--text3);
-    }
+    .notes-hint { font-family: monospace; font-size: 0.65rem; color: var(--muted); }
     .tbtn {
-      background: none; border: none;
-      color: var(--text3); cursor: pointer;
-      font-family: var(--mono); font-size: 10px;
-      padding: 4px 6px; border-radius: 4px;
-      transition: color 0.15s;
-      letter-spacing: 0.05em;
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      font-family: monospace; font-size: 0.65rem;
+      padding: 3px 6px; border-radius: 3px; transition: color 0.15s, background 0.15s;
     }
-    .tbtn:hover { color: var(--accent); }
-    .tbtn.del:hover { color: var(--red); }
+    .tbtn:hover { color: var(--pink); background: rgba(255,0,140,.08); }
+    .tbtn.del:hover { color: var(--p-urgent); background: rgba(192,0,58,.08); }
 
     .empty {
-      text-align: center; padding: 40px 20px;
-      color: var(--text3); font-family: var(--mono); font-size: 11px;
-      line-height: 2.2;
+      text-align: center; padding: 30px 16px;
+      color: var(--muted); font-family: monospace; font-size: 0.75rem;
+      font-style: italic; line-height: 2;
     }
 
     /* ── MODAL ── */
     .moverlay {
       position: fixed; inset: 0;
-      background: rgba(0,0,0,.72);
-      backdrop-filter: blur(4px);
+      background: rgba(92,53,124,.3);
+      backdrop-filter: blur(3px);
       display: flex; align-items: center; justify-content: center;
       z-index: 500;
     }
     .moverlay.hidden { display: none; }
+
     .modal {
-      background: var(--bg2);
-      border: 1px solid var(--border2);
-      border-radius: 12px;
-      width: 580px; max-width: 96vw;
+      background: var(--white);
+      border: 2px solid var(--border-pink);
+      border-radius: var(--radius);
+      width: 560px; max-width: 96vw;
       max-height: 92vh; overflow-y: auto;
-      padding: 32px;
-      animation: popIn 0.22s ease both;
+      padding: 30px 32px;
+      box-shadow: 5px 5px 0 var(--border-dot);
+      animation: popIn 0.2s ease both;
     }
     .modal-title {
-      font-family: var(--mono); font-size: 12px; font-weight: 600;
-      letter-spacing: 0.15em; text-transform: uppercase;
-      color: var(--accent); margin-bottom: 26px;
+      font-size: 1rem; font-weight: bold; color: var(--text);
+      margin-bottom: 20px; padding-bottom: 10px;
+      border-bottom: 1px dotted var(--border-dot);
     }
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .modal-foot {
-      display: flex; justify-content: flex-end; gap: 10px;
-      margin-top: 24px; padding-top: 20px;
-      border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: 9px;
+      margin-top: 20px; padding-top: 16px;
+      border-top: 1px dotted var(--border-dot);
     }
 
     /* notes render */
-    .notes-body { font-size: 14px; line-height: 1.75; color: var(--text2); }
-    .notes-body h1,.notes-body h2,.notes-body h3 {
-      color: var(--text); font-family: var(--mono); margin: 18px 0 8px;
-    }
-    .notes-body p { margin-bottom: 12px; }
+    .notes-body { font-size: 0.9rem; line-height: 1.75; color: var(--text); }
+    .notes-body h1,.notes-body h2,.notes-body h3 { color: var(--text); margin: 14px 0 6px; }
+    .notes-body p { margin-bottom: 10px; }
     .notes-body code {
-      background: var(--bg3); border-radius: 4px;
-      padding: 2px 6px; font-family: var(--mono); font-size: 12px; color: var(--accent);
+      background: rgba(236,169,203,.45); border-radius: 3px;
+      padding: 1px 5px; font-family: monospace; font-size: 0.82rem; color: var(--text);
     }
     .notes-body pre {
-      background: var(--bg3); border: 1px solid var(--border);
-      border-radius: 6px; padding: 14px; overflow-x: auto; margin-bottom: 12px;
+      background: rgba(236,169,203,.25); border: 1px solid var(--border-dot);
+      border-radius: 4px; padding: 12px; overflow-x: auto; margin-bottom: 10px;
     }
     .notes-body pre code { background: none; padding: 0; }
-    .notes-body ul,.notes-body ol { padding-left: 22px; margin-bottom: 12px; }
-    .notes-body li { margin-bottom: 4px; }
+    .notes-body ul,.notes-body ol { padding-left: 20px; margin-bottom: 10px; }
+    .notes-body li { margin-bottom: 3px; }
     .notes-body blockquote {
-      border-left: 3px solid var(--accent);
-      padding-left: 14px; color: var(--text3); margin-bottom: 12px;
+      border-left: 3px solid var(--border-pink);
+      padding-left: 12px; color: var(--muted); margin-bottom: 10px;
     }
-    .notes-body a { color: var(--accent); }
+    .notes-body a { color: var(--pink); }
 
     /* ── SETTINGS DRAWER ── */
     .drawer {
-      position: fixed; right: 0; top: 0; bottom: 0;
-      width: 340px;
-      background: var(--bg2);
-      border-left: 1px solid var(--border2);
-      padding: 32px 24px;
-      z-index: 300;
-      transform: translateX(100%);
-      transition: transform 0.25s ease;
-      overflow-y: auto;
+      position: fixed; right: 0; top: 0; bottom: 0; width: 320px;
+      background: var(--white); border-left: 2px solid var(--border-pink);
+      padding: 28px 22px; z-index: 300;
+      transform: translateX(100%); transition: transform 0.25s ease;
+      overflow-y: auto; box-shadow: -3px 0 0 var(--border-dot);
     }
     .drawer.open { transform: translateX(0); }
     .drawer-title {
-      font-family: var(--mono); font-size: 11px; font-weight: 600;
-      letter-spacing: 0.18em; text-transform: uppercase;
-      color: var(--accent); margin-bottom: 28px;
+      font-size: 0.9rem; font-weight: bold; color: var(--text);
+      margin-bottom: 22px;
       display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 10px; border-bottom: 1px dotted var(--border-dot);
     }
     .sec-title {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--text3);
-      margin-bottom: 14px; padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
+      font-family: monospace; font-size: 0.66rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 12px; padding-bottom: 6px;
+      border-bottom: 1px dotted var(--border-dot);
     }
-    .sec { margin-bottom: 26px; }
-    .divider { height: 1px; background: var(--border); margin: 6px 0 20px; }
-    .info {
-      font-family: var(--mono); font-size: 11px;
-      color: var(--text3); line-height: 1.8;
-    }
+    .sec { margin-bottom: 22px; }
+    .divider { height: 1px; background: var(--border-dot); margin: 6px 0 18px; }
+    .info { font-family: monospace; font-size: 0.7rem; color: var(--muted); line-height: 1.8; }
 
     /* ── SETUP STEPS ── */
     .step { display: none; }
     .step.active { display: block; }
 
-    /* ── ANIMATIONS ── */
-    @keyframes popIn {
-      from { opacity: 0; transform: scale(.96) translateY(6px); }
-      to   { opacity: 1; transform: scale(1)  translateY(0); }
-    }
-    @keyframes pulse {
-      0%,100% { opacity: 1; } 50% { opacity: .35; }
+    /* ── SITE FOOTER ── */
+    footer {
+      padding-top: 12px; padding-bottom: 20px;
+      text-align: center; border-top: 1px dotted var(--border-dot);
+      font-style: italic; font-size: 0.82rem; color: rgb(144, 112, 112);
     }
 
-    /* scrollbar */
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+    /* ── ANIMATIONS ── */
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(.97) translateY(5px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: rgba(255,255,255,.3); }
+    ::-webkit-scrollbar-thumb { background: var(--border-dot); border-radius: 3px; }
   </style>
 </head>
 <body>
@@ -456,13 +419,13 @@
 <!-- ══════════════════════════════ AUTH ══════════════════════════════ -->
 <div class="overlay" id="authOverlay">
   <div class="auth-box">
-    <div class="auth-logo">TASK<span>//</span>CTL</div>
-    <div class="auth-sub">personal task control system</div>
+    <div class="auth-logo">zee's tasks <span>:)</span></div>
+    <div class="auth-sub">enter password to continue</div>
     <div class="field">
       <label class="lbl">access key</label>
-      <input type="password" id="authInput" placeholder="enter password" autocomplete="current-password" />
+      <input type="password" id="authInput" placeholder="password" autocomplete="current-password" />
     </div>
-    <button class="btn btn-primary" onclick="submitAuth()">→ UNLOCK</button>
+    <button class="btn btn-primary" onclick="submitAuth()">unlock →</button>
     <div class="err" id="authErr"></div>
   </div>
 </div>
@@ -470,7 +433,7 @@
 <!-- ══════════════════════════════ SETUP ══════════════════════════════ -->
 <div class="overlay hidden" id="setupOverlay">
   <div class="auth-box" style="width:480px">
-    <div class="auth-logo">TASK<span>//</span>CTL</div>
+    <div class="auth-logo">zee's tasks <span>:)</span></div>
     <div class="auth-sub">first-time setup</div>
 
     <div class="step active" id="step1">
@@ -482,15 +445,15 @@
         <label class="lbl">confirm password</label>
         <input type="password" id="sp2" placeholder="repeat password" />
       </div>
-      <button class="btn btn-primary" onclick="setup1()">→ NEXT</button>
+      <button class="btn btn-primary" onclick="setup1()">next →</button>
       <div class="err" id="se1"></div>
     </div>
 
     <div class="step" id="step2">
-      <p class="info" style="margin-bottom:18px">
-        Tasks sync via a private <strong style="color:var(--accent)">GitHub Gist</strong>.<br>
-        You need a PAT with <strong style="color:var(--accent)">gist</strong> scope.<br><br>
-        Create one at: <span style="color:var(--accent)">github.com → Settings →<br>Developer settings → Personal access tokens</span>
+      <p class="info" style="margin-bottom:16px">
+        Tasks sync via a private <strong style="color:var(--pink)">GitHub Gist</strong>.<br>
+        You need a PAT with <strong style="color:var(--pink)">gist</strong> scope.<br><br>
+        Create one at: <span style="color:var(--pink)">github.com → Settings →<br>Developer settings → Personal access tokens</span>
       </p>
       <div class="field">
         <label class="lbl">GitHub PAT</label>
@@ -500,31 +463,44 @@
         <label class="lbl">existing Gist ID (blank = create new)</label>
         <input type="text" id="sGist" placeholder="leave blank for automatic creation" />
       </div>
-      <button class="btn btn-primary" onclick="setup2()">→ CONNECT &amp; FINISH</button>
+      <button class="btn btn-primary" onclick="setup2()">connect &amp; finish →</button>
       <div class="err" id="se2"></div>
     </div>
   </div>
 </div>
 
-<!-- ══════════════════════════════ HEADER ══════════════════════════════ -->
-<header>
-  <div class="logo">TASK<span>//</span>CTL</div>
-  <div class="hdr-right">
-    <div class="sync-badge">
-      <div class="sdot" id="sdot"></div>
-      <span id="slbl">synced</span>
-    </div>
-    <button class="btn btn-ghost btn-sm" onclick="syncNow()">↑↓ SYNC</button>
-    <button class="btn btn-ghost btn-sm" onclick="openSettings()">⚙ SETTINGS</button>
-  </div>
+<!-- ══════════════════════════════ SITE HEADER ══════════════════════════════ -->
+<header id="site_header">
+  <h1>sheikh zeeshan basar</h1>
+  <nav>
+    <span><a href="https://zeeshanbasar.github.io/">home</a></span>
+    <span>|</span>
+    <span><a href="work.html">work</a></span>
+    <span>|</span>
+    <span><a href="contact.html">contact</a></span>
+    <span>|</span>
+    <span><a class="active" href="tasks.html">tasks</a></span>
+  </nav>
 </header>
+
+<!-- ══════════════════════════════ TOOLBAR ══════════════════════════════ -->
+<div class="toolbar">
+  <div class="sync-badge">
+    <div class="sdot" id="sdot"></div>
+    <span id="slbl">synced</span>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <button class="btn btn-ghost btn-sm" onclick="syncNow()">↑↓ sync</button>
+    <button class="btn btn-ghost btn-sm" onclick="openSettings()">⚙ settings</button>
+  </div>
+</div>
 
 <!-- ══════════════════════════════ BOARD ══════════════════════════════ -->
 <main>
   <div class="board-hdr">
-    <button class="btn btn-primary" style="width:auto" onclick="openModal()">+ NEW TASK</button>
+    <button class="btn btn-primary btn-sm" style="width:auto" onclick="openModal()">+ new task</button>
     <div class="controls">
-      <input class="filter-box" type="text" id="fq" placeholder="search…" oninput="renderBoard()" />
+      <input class="filter-box" type="text" id="fq" placeholder="search tasks…" oninput="renderBoard()" />
       <select class="filter-sel" id="fp" onchange="renderBoard()">
         <option value="">all priorities</option>
         <option value="urgent">urgent</option>
@@ -534,13 +510,22 @@
       </select>
     </div>
   </div>
+
   <div class="board" id="board"></div>
 </main>
+
+<!-- ══════════════════════════════ FOOTER ══════════════════════════════ -->
+<center>
+  <hr width="60%" size="2" align="center">
+  <footer>
+    <em>"A man's reach should exceed his grasp...else, what's the heavens for?"</em>
+  </footer>
+</center>
 
 <!-- ══════════════════════════════ TASK MODAL ══════════════════════════════ -->
 <div class="moverlay hidden" id="taskModal">
   <div class="modal">
-    <div class="modal-title" id="mTitle">NEW TASK</div>
+    <div class="modal-title" id="mTitle">new task</div>
     <input type="hidden" id="mId" />
     <div class="field">
       <label class="lbl">title *</label>
@@ -572,16 +557,16 @@
       </div>
       <div class="field">
         <label class="lbl">tags (comma-separated)</label>
-        <input type="text" id="mTags" placeholder="e.g. work, gnc, review" />
+        <input type="text" id="mTags" placeholder="e.g. research, gnc, review" />
       </div>
     </div>
     <div class="field">
       <label class="lbl">notes — markdown supported</label>
-      <textarea id="mNotes" placeholder="## Notes&#10;&#10;- item one&#10;- item two&#10;&#10;\`code block\`"></textarea>
+      <textarea id="mNotes" placeholder="## Notes&#10;&#10;- item one&#10;- item two"></textarea>
     </div>
     <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="closeModal()">CANCEL</button>
-      <button class="btn btn-primary" style="width:auto" onclick="saveTask()">SAVE TASK</button>
+      <button class="btn btn-ghost" onclick="closeModal()">cancel</button>
+      <button class="btn btn-primary" style="width:auto" onclick="saveTask()">save task</button>
     </div>
   </div>
 </div>
@@ -589,10 +574,10 @@
 <!-- ══════════════════════════════ NOTES MODAL ══════════════════════════════ -->
 <div class="moverlay hidden" id="notesModal">
   <div class="modal">
-    <div class="modal-title" id="nTitle">NOTES</div>
+    <div class="modal-title" id="nTitle">notes</div>
     <div class="notes-body" id="nBody"></div>
     <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="closeNotes()">CLOSE</button>
+      <button class="btn btn-ghost" onclick="closeNotes()">close</button>
     </div>
   </div>
 </div>
@@ -600,7 +585,7 @@
 <!-- ══════════════════════════════ SETTINGS ══════════════════════════════ -->
 <div class="drawer" id="drawer">
   <div class="drawer-title">
-    SETTINGS
+    settings
     <button class="tbtn" onclick="closeSettings()" style="font-size:14px">✕</button>
   </div>
 
@@ -614,7 +599,7 @@
       <label class="lbl">Gist ID</label>
       <input type="text" id="dGist" />
     </div>
-    <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="saveGistCfg()">SAVE &amp; RE-SYNC</button>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="saveGistCfg()">save &amp; re-sync</button>
     <div class="err" id="dGistErr"></div>
   </div>
 
@@ -630,7 +615,7 @@
       <label class="lbl">confirm</label>
       <input type="password" id="dP2" placeholder="repeat" />
     </div>
-    <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="changePass()">UPDATE PASSWORD</button>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="changePass()">update password</button>
     <div class="err" id="dPassErr"></div>
   </div>
 
@@ -638,41 +623,39 @@
 
   <div class="sec">
     <div class="sec-title">Danger zone</div>
-    <button class="btn btn-danger btn-sm" onclick="clearData()">CLEAR ALL LOCAL DATA</button>
+    <button class="btn btn-danger btn-sm" onclick="clearData()">clear all local data</button>
     <p class="info" style="margin-top:10px">Does not delete your Gist. Reload to set up again.</p>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-//  TASKCTL  ·  Personal Task Tracker
-//  Stores tasks in a private GitHub Gist
-//  Protected by client-side SHA-256 password hash
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════
+//  localStorage keys + Gist filename are IDENTICAL
+//  to the previous version — your data is safe.
+// ════════════════════════════════════════════════════
 
 const FILE = 'taskctl_data.json';
 let tasks = [];
 let dragId = null;
 
-// ── utils ──────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+
 async function sha256(msg) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
   return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-// ── boot ───────────────────────────────────────────────
+// ── boot ──────────────────────────────────────────────
 function boot() {
   if (!localStorage.getItem('tc_hash')) {
     $('authOverlay').classList.add('hidden');
     $('setupOverlay').classList.remove('hidden');
   }
-  // authOverlay shown by default
 }
 
-// ── auth ───────────────────────────────────────────────
+// ── auth ──────────────────────────────────────────────
 async function submitAuth() {
   const v = $('authInput').value;
   if (!v) return;
@@ -688,7 +671,7 @@ async function submitAuth() {
 }
 $('authInput').addEventListener('keydown', e => { if (e.key==='Enter') submitAuth(); });
 
-// ── setup ──────────────────────────────────────────────
+// ── setup ─────────────────────────────────────────────
 let pendingHash = null;
 
 async function setup1() {
@@ -709,14 +692,14 @@ async function setup2() {
     if (!id) {
       const r = await fetch('https://api.github.com/gists', {
         method:'POST',
-        headers:{ 'Authorization':`Bearer ${pat}`, 'Content-Type':'application/json', 'X-GitHub-Api-Version':'2022-11-28' },
-        body: JSON.stringify({ description:'TASKCTL data — do not edit manually', public:false, files:{ [FILE]:{ content:'[]' } } })
+        headers:{'Authorization':`Bearer ${pat}`,'Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28'},
+        body: JSON.stringify({description:'TASKCTL data — do not edit manually',public:false,files:{[FILE]:{content:'[]'}}})
       });
       if (!r.ok) throw new Error(`GitHub ${r.status}: ${await r.text()}`);
       id = (await r.json()).id;
     } else {
       const r = await fetch(`https://api.github.com/gists/${id}`, {
-        headers:{ 'Authorization':`Bearer ${pat}`, 'X-GitHub-Api-Version':'2022-11-28' }
+        headers:{'Authorization':`Bearer ${pat}`,'X-GitHub-Api-Version':'2022-11-28'}
       });
       if (!r.ok) throw new Error(`Gist not found (${r.status})`);
     }
@@ -728,13 +711,13 @@ async function setup2() {
   } catch(e) { err.textContent = e.message; }
 }
 
-// ── init ───────────────────────────────────────────────
+// ── init ──────────────────────────────────────────────
 async function initApp() {
   renderBoard();
   await syncNow();
 }
 
-// ── sync ───────────────────────────────────────────────
+// ── sync ──────────────────────────────────────────────
 function setSyncState(state, label) {
   $('sdot').className = 'sdot' + (state==='syncing'?' syncing':state==='error'?' error':'');
   $('slbl').textContent = label;
@@ -746,7 +729,7 @@ async function syncNow() {
   setSyncState('syncing','syncing…');
   try {
     const r = await fetch(`https://api.github.com/gists/${id}`, {
-      headers:{ 'Authorization':`Bearer ${pat}`, 'X-GitHub-Api-Version':'2022-11-28' }
+      headers:{'Authorization':`Bearer ${pat}`,'X-GitHub-Api-Version':'2022-11-28'}
     });
     if (!r.ok) throw new Error(r.status);
     const d = await r.json();
@@ -764,8 +747,8 @@ async function pushGist() {
   try {
     await fetch(`https://api.github.com/gists/${id}`, {
       method:'PATCH',
-      headers:{ 'Authorization':`Bearer ${pat}`, 'Content-Type':'application/json', 'X-GitHub-Api-Version':'2022-11-28' },
-      body: JSON.stringify({ files:{ [FILE]:{ content: JSON.stringify(tasks,null,2) } } })
+      headers:{'Authorization':`Bearer ${pat}`,'Content-Type':'application/json','X-GitHub-Api-Version':'2022-11-28'},
+      body: JSON.stringify({files:{[FILE]:{content:JSON.stringify(tasks,null,2)}}})
     });
     setSyncState('ok', `saved ${new Date().toLocaleTimeString()}`);
   } catch(e) { setSyncState('error','save error'); }
@@ -773,9 +756,9 @@ async function pushGist() {
 
 // ── render ─────────────────────────────────────────────
 const COLS = [
-  { id:'todo',       label:'TO DO',       color:'#4895ef' },
-  { id:'inprogress', label:'IN PROGRESS', color:'#ffd166' },
-  { id:'done',       label:'DONE',        color:'#06d6a0' },
+  { id:'todo',       label:'to do',       color:'#4895ef' },
+  { id:'inprogress', label:'in progress', color:'#b07800' },
+  { id:'done',       label:'done',        color:'#1aad6e' },
 ];
 
 function filtered() {
@@ -808,7 +791,7 @@ function renderBoard() {
       </div>
       <div class="col-body">
         ${ct.length===0
-          ? `<div class="empty">// empty<br>drag tasks here</div>`
+          ? `<div class="empty">— empty —<br>drop tasks here</div>`
           : ct.map(cardHTML).join('')}
       </div>
     </div>`;
@@ -839,14 +822,14 @@ function cardHTML(t) {
     <div class="card-foot">
       ${t.notes?`<span class="notes-hint">✎ notes</span>`:''}
       <span class="spacer"></span>
-      <button class="tbtn" onclick="viewNotes('${t.id}')">VIEW</button>
-      <button class="tbtn" onclick="openModal('${t.id}')">EDIT</button>
+      <button class="tbtn" onclick="viewNotes('${t.id}')">view</button>
+      <button class="tbtn" onclick="openModal('${t.id}')">edit</button>
       <button class="tbtn del" onclick="delTask('${t.id}')">✕</button>
     </div>
   </div>`;
 }
 
-// ── drag & drop ────────────────────────────────────────
+// ── drag & drop ───────────────────────────────────────
 function dragStart(e,id) { dragId=id; e.dataTransfer.effectAllowed='move'; }
 function dragEnd() { document.querySelectorAll('.column').forEach(c=>c.classList.remove('drag-over')); }
 function dragOver(e,col) { e.preventDefault(); $('col-'+col)?.classList.add('drag-over'); }
@@ -859,12 +842,12 @@ function drop(e,col) {
   dragId=null;
 }
 
-// ── task crud ──────────────────────────────────────────
+// ── task crud ─────────────────────────────────────────
 function openModal(id) {
   $('taskModal').classList.remove('hidden');
   if (id) {
     const t=tasks.find(x=>x.id===id); if(!t) return;
-    $('mTitle').textContent='EDIT TASK';
+    $('mTitle').textContent='edit task';
     $('mId').value=id;
     $('mTitle_').value=t.title;
     $('mStatus').value=t.status;
@@ -873,7 +856,7 @@ function openModal(id) {
     $('mTags').value=(t.tags||[]).join(', ');
     $('mNotes').value=t.notes||'';
   } else {
-    $('mTitle').textContent='NEW TASK';
+    $('mTitle').textContent='new task';
     $('mId').value='';
     $('mTitle_').value=''; $('mStatus').value='todo';
     $('mPri').value='medium'; $('mDue').value='';
@@ -899,7 +882,7 @@ function saveTask() {
     const i=tasks.findIndex(t=>t.id===id);
     if (i>-1) tasks[i]={...tasks[i],...data};
   } else {
-    tasks.push({ id:uid(), createdAt:new Date().toISOString(), ...data });
+    tasks.push({id:uid(),createdAt:new Date().toISOString(),...data});
   }
   closeModal(); renderBoard(); pushGist();
 }
@@ -910,18 +893,18 @@ function delTask(id) {
   renderBoard(); pushGist();
 }
 
-// ── notes view ─────────────────────────────────────────
+// ── notes view ────────────────────────────────────────
 function viewNotes(id) {
   const t=tasks.find(x=>x.id===id); if(!t) return;
-  $('nTitle').textContent=t.title.toUpperCase();
+  $('nTitle').textContent=t.title;
   $('nBody').innerHTML = t.notes
     ? marked.parse(t.notes)
-    : '<span style="color:var(--text3);font-family:var(--mono);font-size:12px">// no notes</span>';
+    : '<span style="color:var(--muted);font-family:monospace;font-size:0.8rem;font-style:italic">— no notes —</span>';
   $('notesModal').classList.remove('hidden');
 }
 function closeNotes() { $('notesModal').classList.add('hidden'); }
 
-// ── settings ───────────────────────────────────────────
+// ── settings ──────────────────────────────────────────
 function openSettings() {
   $('dPAT').value  = localStorage.getItem('tc_pat')  ? '••••••••' : '';
   $('dGist').value = localStorage.getItem('tc_gist') || '';
@@ -943,7 +926,7 @@ async function changePass() {
   if (!p1) { err.textContent='password cannot be empty'; return; }
   if (p1!==p2) { err.textContent='passwords do not match'; return; }
   localStorage.setItem('tc_hash', await sha256(p1));
-  err.style.color='var(--green)'; err.textContent='password updated!';
+  err.style.color='rgb(26,173,110)'; err.textContent='password updated!';
   setTimeout(()=>{ err.textContent=''; err.style.color=''; },2500);
 }
 
@@ -953,7 +936,7 @@ function clearData() {
   location.reload();
 }
 
-// ── keyboard ───────────────────────────────────────────
+// ── keyboard ──────────────────────────────────────────
 document.addEventListener('keydown', e => {
   if (e.key==='Escape') { closeModal(); closeNotes(); closeSettings(); }
   const tag=document.activeElement.tagName;
