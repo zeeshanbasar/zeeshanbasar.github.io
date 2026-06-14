@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>notes // zee</title>
+  <style>
+    :root {
+      --bg:         rgb(236, 169, 203);
+      --text:       rgb(92,  53,  124);
+      --pink:       rgb(255, 0,   140);
+      --purple:     rgb(195, 0,   255);
+      --border-pink:rgb(255, 0,   140);
+      --border-dot: rgb(219, 103, 167);
+      --white:      #fff;
+      --muted:      rgba(92, 53, 124, 0.5);
+      --panel:      rgba(255,255,255,0.45);
+      --panel-side: rgba(255,255,255,0.3);
+      --radius:     5px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { background: var(--bg); color: var(--text); height: 100%; }
+    body { font-family: Georgia, 'Times New Roman', serif; height: 100%; display: flex; flex-direction: column; }
+
+    a { color: var(--pink); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    a.active { color: var(--purple); }
+
+    /* ── OVERLAY ── */
+    .overlay {
+      position: fixed; inset: 0; background: var(--bg);
+      display: flex; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .overlay.hidden { display: none; }
+
+    .auth-box {
+      background: var(--white);
+      border: 2px solid var(--border-pink);
+      border-radius: var(--radius);
+      padding: 40px 44px; width: 400px; max-width: 92vw;
+      box-shadow: 4px 4px 0 var(--border-dot);
+      animation: popIn 0.25s ease both;
+    }
+    .auth-logo { font-size: 1.35rem; font-weight: bold; color: var(--text); margin-bottom: 4px; }
+    .auth-logo span { color: var(--pink); }
+    .auth-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 28px; font-style: italic; }
+
+    .field { margin-bottom: 16px; }
+    .lbl {
+      display: block; font-size: 0.7rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 6px; font-family: monospace;
+    }
+    input[type="password"] {
+      width: 100%; background: rgba(236,169,203,0.2);
+      border: 1px solid var(--border-dot); border-radius: var(--radius);
+      color: var(--text); font-family: Georgia, serif; font-size: 0.9rem;
+      padding: 9px 12px; outline: none; transition: border-color 0.2s;
+    }
+    input:focus { border-color: var(--pink); }
+    ::placeholder { color: var(--muted); }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 18px; border-radius: var(--radius);
+      font-family: Georgia, serif; font-size: 0.85rem;
+      cursor: pointer; border: none; transition: all 0.15s;
+    }
+    .btn-primary {
+      background: var(--pink); color: #fff;
+      width: 100%; justify-content: center; border: 2px solid var(--pink);
+    }
+    .btn-primary:hover { background: var(--purple); border-color: var(--purple); }
+    .err { font-family: monospace; font-size: 0.73rem; color: #c0003a; min-height: 16px; margin-top: 8px; }
+
+    /* ── SITE HEADER ── */
+    #site_header {
+      border-bottom: 1px solid var(--border-pink);
+      text-align: center; padding: 18px 0 12px; flex-shrink: 0;
+    }
+    #site_header h1 { font-size: 1.4rem; margin-bottom: 7px; }
+    #site_header nav span { margin: 0 3px; }
+
+    /* ── TOOLBAR ── */
+    .toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 8px; padding: 9px 16px;
+      border-bottom: 1px dotted var(--border-dot);
+      background: rgba(255,255,255,0.25); flex-shrink: 0;
+      font-size: 0.73rem; font-family: monospace;
+    }
+    .sync-badge { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+    .sdot { width: 6px; height: 6px; border-radius: 50%; background: #1aad6e; flex-shrink: 0; }
+    .sdot.syncing { background: #b07800; animation: pulse 1s infinite; }
+    .sdot.error   { background: #c0003a; }
+    .tbtn-sm {
+      background: transparent; border: 1px solid var(--border-dot);
+      border-radius: var(--radius); color: var(--text); font-family: Georgia, serif;
+      font-size: 0.75rem; padding: 4px 10px; cursor: pointer; transition: all 0.15s;
+    }
+    .tbtn-sm:hover { border-color: var(--pink); color: var(--pink); }
+
+    /* ── MAIN TWO-PANEL ── */
+    .app {
+      display: flex; flex: 1; overflow: hidden; min-height: 0;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 220px; flex-shrink: 0;
+      background: var(--panel-side);
+      border-right: 1px solid var(--border-dot);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar-hdr {
+      padding: 10px 12px;
+      border-bottom: 1px dotted var(--border-dot);
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,0.2); flex-shrink: 0;
+    }
+    .sidebar-hdr-label {
+      font-family: monospace; font-size: 0.66rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+    }
+    .new-btn {
+      background: var(--pink); color: #fff;
+      border: none; border-radius: 3px;
+      font-family: monospace; font-size: 0.68rem;
+      padding: 3px 8px; cursor: pointer; transition: background 0.15s;
+    }
+    .new-btn:hover { background: var(--purple); }
+
+    .note-list {
+      overflow-y: auto; flex: 1;
+    }
+
+    .note-item {
+      padding: 10px 12px;
+      border-bottom: 1px dotted rgba(219,103,167,0.4);
+      cursor: pointer; transition: background 0.12s;
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    .note-item:hover { background: rgba(255,255,255,0.3); }
+    .note-item.active { background: rgba(255,255,255,0.6); border-left: 3px solid var(--pink); padding-left: 9px; }
+
+    .note-item-title {
+      font-size: 0.82rem; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      font-weight: bold;
+    }
+    .note-item-preview {
+      font-size: 0.68rem; color: var(--muted); font-family: monospace;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .note-item-date {
+      font-size: 0.62rem; color: var(--muted); font-family: monospace;
+    }
+
+    .empty-sidebar {
+      padding: 24px 12px; text-align: center;
+      font-size: 0.75rem; color: var(--muted); font-style: italic; line-height: 1.9;
+    }
+
+    /* ── EDITOR PANE ── */
+    .editor-pane {
+      flex: 1; display: flex; flex-direction: column; overflow: hidden;
+      background: var(--panel);
+    }
+
+    .editor-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 14px; gap: 10px;
+      border-bottom: 1px dotted var(--border-dot);
+      background: rgba(255,255,255,0.3); flex-shrink: 0;
+    }
+
+    .note-title-input {
+      flex: 1; background: transparent; border: none;
+      color: var(--text); font-family: Georgia, serif;
+      font-size: 0.95rem; font-weight: bold;
+      outline: none; padding: 0;
+    }
+    .note-title-input::placeholder { color: var(--muted); font-weight: normal; }
+
+    .editor-meta {
+      font-family: monospace; font-size: 0.62rem; color: var(--muted);
+      white-space: nowrap; flex-shrink: 0;
+    }
+
+    .del-btn {
+      background: transparent; border: 1px solid rgba(192,0,58,0.35);
+      border-radius: 3px; color: #c0003a;
+      font-family: monospace; font-size: 0.65rem;
+      padding: 3px 8px; cursor: pointer; transition: all 0.15s; flex-shrink: 0;
+    }
+    .del-btn:hover { background: #c0003a; color: #fff; }
+
+    .note-body {
+      flex: 1; resize: none; border: none; outline: none;
+      background: transparent;
+      color: var(--text); font-family: monospace;
+      font-size: 0.88rem; line-height: 1.75;
+      padding: 18px 20px;
+      overflow-y: auto;
+    }
+    .note-body::placeholder { color: var(--muted); font-style: italic; }
+
+    .editor-empty {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 10px;
+      color: var(--muted); font-style: italic; font-size: 0.82rem; text-align: center;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center; padding: 10px;
+      border-top: 1px dotted var(--border-dot);
+      font-style: italic; font-size: 0.75rem; color: rgb(144,112,112);
+      flex-shrink: 0;
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 600px) {
+      .sidebar { width: 160px; }
+      .note-body { font-size: 0.82rem; padding: 12px; }
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(.97) translateY(5px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-dot); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════ AUTH ══════════════════════════════ -->
+<div class="overlay" id="authOverlay">
+  <div class="auth-box">
+    <div class="auth-logo">zee's notes <span>:)</span></div>
+    <div class="auth-sub">enter password to continue</div>
+    <div class="field">
+      <label class="lbl">access key</label>
+      <input type="password" id="authInput" placeholder="password" autocomplete="current-password" />
+    </div>
+    <button class="btn btn-primary" onclick="submitAuth()">unlock →</button>
+    <div class="err" id="authErr"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ SITE HEADER ══════════════════════════════ -->
+<header id="site_header">
+  <h1>sheikh zeeshan basar</h1>
+  <nav>
+    <span><a href="https://zeeshanbasar.github.io/">home</a></span>
+    <span>|</span>
+    <span><a href="work.html">work</a></span>
+    <span>|</span>
+    <span><a href="contact.html">contact</a></span>
+    <span>|</span>
+    <span><a href="tasks.html">tasks</a></span>
+    <span>|</span>
+    <span><a class="active" href="notes.html">notes</a></span>
+  </nav>
+</header>
+
+<!-- ══════════════════════════════ TOOLBAR ══════════════════════════════ -->
+<div class="toolbar">
+  <div class="sync-badge">
+    <div class="sdot" id="sdot"></div>
+    <span id="slbl">synced</span>
+  </div>
+  <button class="tbtn-sm" onclick="syncNow()">↑↓ sync</button>
+</div>
+
+<!-- ══════════════════════════════ APP ══════════════════════════════ -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-hdr">
+      <span class="sidebar-hdr-label">notes</span>
+      <button class="new-btn" onclick="newNote()">+ new</button>
+    </div>
+    <div class="note-list" id="noteList"></div>
+  </div>
+
+  <!-- EDITOR -->
+  <div class="editor-pane" id="editorPane">
+    <div class="editor-empty" id="editorEmpty">
+      <span>← select a note,</span>
+      <span>or create a new one</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════ FOOTER ══════════════════════════════ -->
+<footer>
+  <em>"A man's reach should exceed his grasp...else, what's the heavens for?"</em>
+</footer>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  NOTES  ·  Simple scratchpad synced to GitHub Gist
+//  Uses the same tc_hash / tc_pat / tc_gist as tasks.html
+//  Data file: notes_data.json  (separate from tasks)
+// ════════════════════════════════════════════════════════
+
+const FILE  = 'notes_data.json';
+let notes   = [];          // array of { id, title, body, createdAt, updatedAt }
+let current = null;        // id of open note
+let saveTimer = null;
+
+const $ = id => document.getElementById(id);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+
+async function sha256(msg) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── boot ─────────────────────────────────────────────
+function boot() {
+  const hash = localStorage.getItem('tc_hash');
+  const pat  = localStorage.getItem('tc_pat');
+  const gist = localStorage.getItem('tc_gist');
+
+  if (!hash || !pat || !gist) {
+    // No credentials at all — direct them to tasks.html for first-time setup
+    $('authErr').textContent = '';
+    $('authOverlay').classList.remove('hidden');
+    const sub = $('authOverlay').querySelector('.auth-sub');
+    if (!hash) {
+      sub.textContent = 'please complete setup on tasks.html first';
+      $('authOverlay').querySelector('input').style.display = 'none';
+      $('authOverlay').querySelector('.btn-primary').style.display = 'none';
+      const link = document.createElement('a');
+      link.href = 'tasks.html'; link.textContent = '→ go to tasks.html';
+      link.style.cssText = 'display:block;text-align:center;margin-top:14px;color:var(--pink);font-size:0.9rem';
+      $('authOverlay').querySelector('.auth-box').appendChild(link);
+    }
+    return;
+  }
+  // Credentials exist — just ask for password
+}
+
+// ── auth ─────────────────────────────────────────────
+async function submitAuth() {
+  const v = $('authInput').value;
+  if (!v) return;
+  const h = await sha256(v);
+  if (h === localStorage.getItem('tc_hash')) {
+    $('authOverlay').classList.add('hidden');
+    initApp();
+  } else {
+    $('authErr').textContent = 'incorrect password';
+    $('authInput').value = '';
+    $('authInput').focus();
+  }
+}
+$('authInput').addEventListener('keydown', e => { if (e.key === 'Enter') submitAuth(); });
+
+// ── init ─────────────────────────────────────────────
+async function initApp() {
+  renderList();
+  await syncNow();
+}
+
+// ── sync ─────────────────────────────────────────────
+function setSyncState(state, label) {
+  $('sdot').className = 'sdot' + (state === 'syncing' ? ' syncing' : state === 'error' ? ' error' : '');
+  $('slbl').textContent = label;
+}
+
+async function syncNow() {
+  const pat = localStorage.getItem('tc_pat');
+  const id  = localStorage.getItem('tc_gist');
+  if (!pat || !id) return;
+  setSyncState('syncing', 'syncing…');
+  try {
+    const r = await fetch(`https://api.github.com/gists/${id}`, {
+      headers: { 'Authorization': `Bearer ${pat}`, 'X-GitHub-Api-Version': '2022-11-28' }
+    });
+    if (!r.ok) throw new Error(r.status);
+    const data  = await r.json();
+    const raw   = data.files[FILE]?.content;
+    if (raw) notes = JSON.parse(raw);
+    renderList();
+    if (current) openNote(current, false);   // refresh open note from remote
+    setSyncState('ok', `synced ${new Date().toLocaleTimeString()}`);
+  } catch(e) { setSyncState('error', 'sync error'); }
+}
+
+async function pushGist() {
+  const pat = localStorage.getItem('tc_pat');
+  const id  = localStorage.getItem('tc_gist');
+  if (!pat || !id) return;
+  setSyncState('syncing', 'saving…');
+  try {
+    await fetch(`https://api.github.com/gists/${id}`, {
+      method: 'PATCH',
+      headers: { 'Authorization': `Bearer ${pat}`, 'Content-Type': 'application/json', 'X-GitHub-Api-Version': '2022-11-28' },
+      body: JSON.stringify({ files: { [FILE]: { content: JSON.stringify(notes, null, 2) } } })
+    });
+    setSyncState('ok', `saved ${new Date().toLocaleTimeString()}`);
+  } catch(e) { setSyncState('error', 'save error'); }
+}
+
+// ── render sidebar ────────────────────────────────────
+function renderList() {
+  const list = $('noteList');
+  if (notes.length === 0) {
+    list.innerHTML = `<div class="empty-sidebar">no notes yet.<br>hit "+ new" to start.</div>`;
+    return;
+  }
+  // most-recently-updated first
+  const sorted = [...notes].sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+  list.innerHTML = sorted.map(n => {
+    const preview = (n.body || '').replace(/\n/g,' ').slice(0, 48);
+    const when    = fmtDate(n.updatedAt);
+    const isCurr  = n.id === current;
+    return `
+    <div class="note-item ${isCurr ? 'active' : ''}" onclick="openNote('${n.id}')">
+      <div class="note-item-title">${escHtml(n.title || 'untitled')}</div>
+      ${preview ? `<div class="note-item-preview">${escHtml(preview)}</div>` : ''}
+      <div class="note-item-date">${when}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── open note ─────────────────────────────────────────
+function openNote(id, rerender = true) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  current = id;
+  if (rerender) renderList();
+
+  const pane = $('editorPane');
+  pane.innerHTML = `
+    <div class="editor-bar">
+      <input class="note-title-input" id="noteTitle"
+             value="${escAttr(note.title)}"
+             placeholder="untitled"
+             oninput="onTitleChange()" />
+      <span class="editor-meta" id="editorMeta">${fmtDate(note.updatedAt)}</span>
+      <button class="del-btn" onclick="deleteNote('${note.id}')">delete</button>
+    </div>
+    <textarea class="note-body" id="noteBody"
+              placeholder="start typing…"
+              spellcheck="true"
+              oninput="onBodyChange()">${escHtml(note.body || '')}</textarea>
+  `;
+  $('noteBody').focus();
+}
+
+// ── new note ──────────────────────────────────────────
+function newNote() {
+  const note = {
+    id:        uid(),
+    title:     '',
+    body:      '',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  notes.unshift(note);
+  openNote(note.id);
+  pushGist();
+}
+
+// ── delete note ───────────────────────────────────────
+function deleteNote(id) {
+  if (!confirm('Delete this note?')) return;
+  notes = notes.filter(n => n.id !== id);
+  current = null;
+  $('editorPane').innerHTML = `
+    <div class="editor-empty">
+      <span>← select a note,</span>
+      <span>or create a new one</span>
+    </div>`;
+  renderList();
+  pushGist();
+}
+
+// ── edit handlers ─────────────────────────────────────
+function onTitleChange() {
+  const note = notes.find(n => n.id === current);
+  if (!note) return;
+  note.title     = $('noteTitle').value;
+  note.updatedAt = new Date().toISOString();
+  renderList();
+  scheduleSave();
+}
+
+function onBodyChange() {
+  const note = notes.find(n => n.id === current);
+  if (!note) return;
+  note.body      = $('noteBody').value;
+  note.updatedAt = new Date().toISOString();
+  updateMeta();
+  scheduleSave();
+}
+
+function updateMeta() {
+  const el = $('editorMeta');
+  if (el) el.textContent = 'saving…';
+}
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    await pushGist();
+    const el = $('editorMeta');
+    const note = notes.find(n => n.id === current);
+    if (el && note) el.textContent = fmtDate(note.updatedAt);
+  }, 1200);
+}
+
+// ── utils ─────────────────────────────────────────────
+function fmtDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const today = new Date();
+  const isToday = d.toDateString() === today.toDateString();
+  if (isToday) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function escAttr(s) {
+  return String(s || '').replace(/"/g,'&quot;');
+}
+
+// ── keyboard ──────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  // Cmd/Ctrl+S → force save now
+  if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+    e.preventDefault();
+    clearTimeout(saveTimer);
+    pushGist();
+  }
+});
+
+boot();
+</script>
+</body>
+</html>
