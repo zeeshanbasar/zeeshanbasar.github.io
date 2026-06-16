@@ -6,237 +6,266 @@
   <title>notes // zee</title>
   <style>
     :root {
-      --bg:         rgb(236, 169, 203);
-      --text:       rgb(92,  53,  124);
-      --pink:       rgb(255, 0,   140);
-      --purple:     rgb(195, 0,   255);
-      --border-pink:rgb(255, 0,   140);
-      --border-dot: rgb(219, 103, 167);
-      --white:      #fff;
-      --muted:      rgba(92, 53, 124, 0.5);
-      --panel:      rgba(255,255,255,0.45);
-      --panel-side: rgba(255,255,255,0.3);
-      --radius:     5px;
+      --bg:     #000;
+      --bg2:    #111;
+      --bg3:    #1a1a1a;
+      --border: #333;
+      --text:   #f0f0f0;
+      --muted:  #666;
+      --dim:    #444;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { background: var(--bg); color: var(--text); height: 100%; }
-    body { font-family: Georgia, 'Times New Roman', serif; height: 100%; display: flex; flex-direction: column; }
 
-    a { color: var(--pink); text-decoration: none; }
+    html { background: var(--bg); color: var(--text); height: 100%; }
+
+    body {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a { color: var(--text); text-decoration: none; }
     a:hover { text-decoration: underline; }
-    a.active { color: var(--purple); }
+    a.active { text-decoration: underline; }
 
     /* ── OVERLAY ── */
     .overlay {
-      position: fixed; inset: 0; background: var(--bg);
-      display: flex; align-items: center; justify-content: center; z-index: 1000;
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
     }
     .overlay.hidden { display: none; }
 
     .auth-box {
-      background: var(--white);
-      border: 2px solid var(--border-pink);
-      border-radius: var(--radius);
-      padding: 40px 44px; width: 400px; max-width: 92vw;
-      box-shadow: 4px 4px 0 var(--border-dot);
-      animation: popIn 0.25s ease both;
+      border: 1px solid var(--border);
+      padding: 40px 44px;
+      width: 360px;
+      max-width: 92vw;
     }
-    .auth-logo { font-size: 1.35rem; font-weight: bold; color: var(--text); margin-bottom: 4px; }
-    .auth-logo span { color: var(--pink); }
-    .auth-sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 28px; font-style: italic; }
+    .auth-logo { font-size: 1rem; color: var(--text); margin-bottom: 4px; }
+    .auth-sub  { font-size: 0.8rem; color: var(--muted); margin-bottom: 28px; }
 
-    .field { margin-bottom: 16px; }
+    .field { margin-bottom: 14px; }
     .lbl {
-      display: block; font-size: 0.7rem; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--muted); margin-bottom: 6px; font-family: monospace;
+      display: block; font-size: 0.75rem; color: var(--muted);
+      margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.08em;
     }
     input[type="password"] {
-      width: 100%; background: rgba(236,169,203,0.2);
-      border: 1px solid var(--border-dot); border-radius: var(--radius);
-      color: var(--text); font-family: Georgia, serif; font-size: 0.9rem;
-      padding: 9px 12px; outline: none; transition: border-color 0.2s;
+      width: 100%; background: var(--bg); border: 1px solid var(--border);
+      color: var(--text); font-family: 'Courier New', monospace;
+      font-size: 0.9rem; padding: 8px 10px; outline: none;
     }
-    input:focus { border-color: var(--pink); }
+    input[type="password"]:focus { border-color: var(--text); }
     ::placeholder { color: var(--muted); }
 
-    .btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 9px 18px; border-radius: var(--radius);
-      font-family: Georgia, serif; font-size: 0.85rem;
-      cursor: pointer; border: none; transition: all 0.15s;
-    }
     .btn-primary {
-      background: var(--pink); color: #fff;
-      width: 100%; justify-content: center; border: 2px solid var(--pink);
+      display: block; width: 100%;
+      background: var(--text); color: var(--bg);
+      border: none; font-family: 'Courier New', monospace;
+      font-size: 0.85rem; padding: 9px; cursor: pointer;
     }
-    .btn-primary:hover { background: var(--purple); border-color: var(--purple); }
-    .err { font-family: monospace; font-size: 0.73rem; color: #c0003a; min-height: 16px; margin-top: 8px; }
+    .btn-primary:hover { background: var(--muted); color: var(--text); }
+    .err { font-size: 0.75rem; color: var(--muted); min-height: 16px; margin-top: 8px; }
 
     /* ── SITE HEADER ── */
     #site_header {
-      border-bottom: 1px solid var(--border-pink);
-      text-align: center; padding: 18px 0 12px; flex-shrink: 0;
+      border-bottom: 1px solid var(--border);
+      text-align: center; padding: 14px 0 10px; flex-shrink: 0;
     }
-    #site_header h1 { font-size: 1.4rem; margin-bottom: 7px; }
-    #site_header nav span { margin: 0 3px; }
+    #site_header h1 { font-size: 1rem; font-weight: normal; color: var(--muted); margin-bottom: 6px; }
+    #site_header nav { font-size: 0.82rem; color: var(--dim); }
+    #site_header nav span { margin: 0 2px; }
 
     /* ── TOOLBAR ── */
     .toolbar {
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 8px; padding: 9px 16px;
-      border-bottom: 1px dotted var(--border-dot);
-      background: rgba(255,255,255,0.25); flex-shrink: 0;
-      font-size: 0.73rem; font-family: monospace;
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 8px;
+      padding: 6px 14px; border-bottom: 1px solid var(--border);
+      background: var(--bg2); flex-shrink: 0;
+      font-size: 0.75rem; color: var(--muted);
     }
-    .sync-badge { display: flex; align-items: center; gap: 6px; color: var(--muted); }
-    .sdot { width: 6px; height: 6px; border-radius: 50%; background: #1aad6e; flex-shrink: 0; }
-    .sdot.syncing { background: #b07800; animation: pulse 1s infinite; }
-    .sdot.error   { background: #c0003a; }
-    .tbtn-sm {
-      background: transparent; border: 1px solid var(--border-dot);
-      border-radius: var(--radius); color: var(--text); font-family: Georgia, serif;
-      font-size: 0.75rem; padding: 4px 10px; cursor: pointer; transition: all 0.15s;
-    }
-    .tbtn-sm:hover { border-color: var(--pink); color: var(--pink); }
+    .sync-badge { display: flex; align-items: center; gap: 6px; }
+    .sdot { width: 5px; height: 5px; background: var(--muted); flex-shrink: 0; }
+    .sdot.syncing { animation: pulse 1s infinite; }
+    .sdot.error   { background: #888; }
 
-    /* ── MAIN TWO-PANEL ── */
-    .app {
-      display: flex; flex: 1; overflow: hidden; min-height: 0;
+    .tbtn-sm {
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); font-family: 'Courier New', monospace;
+      font-size: 0.72rem; padding: 3px 8px; cursor: pointer;
     }
+    .tbtn-sm:hover { color: var(--text); border-color: var(--dim); }
+
+    /* ── APP ── */
+    .app { display: flex; flex: 1; overflow: hidden; min-height: 0; }
 
     /* ── SIDEBAR ── */
     .sidebar {
-      width: 220px; flex-shrink: 0;
-      background: var(--panel-side);
-      border-right: 1px solid var(--border-dot);
+      /* width set via JS / localStorage */
+      flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      background: var(--bg2);
       display: flex; flex-direction: column;
       overflow: hidden;
+      position: relative;       /* for resize handle */
+      min-width: 32px;
+      max-width: 400px;
     }
 
+    /* ── RESIZE HANDLE ── */
+    .resize-handle {
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      width: 4px;
+      cursor: col-resize;
+      z-index: 20;
+    }
+    .resize-handle:hover,
+    .resize-handle.dragging { background: var(--dim); }
+
+    /* ── SIDEBAR HEADER ── */
     .sidebar-hdr {
-      padding: 10px 12px;
-      border-bottom: 1px dotted var(--border-dot);
+      padding: 8px 6px;
+      border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
-      background: rgba(255,255,255,0.2); flex-shrink: 0;
+      flex-shrink: 0; overflow: hidden; gap: 4px;
     }
     .sidebar-hdr-label {
-      font-family: monospace; font-size: 0.66rem;
-      letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+      font-size: 0.66rem; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      white-space: nowrap; overflow: hidden;
+      flex: 1;
     }
+    /* hide label when narrow */
+    .sidebar.narrow .sidebar-hdr-label { display: none; }
+    .sidebar.narrow .sidebar-hdr { justify-content: center; padding: 8px 0; }
+
     .new-btn {
-      background: var(--pink); color: #fff;
-      border: none; border-radius: 3px;
-      font-family: monospace; font-size: 0.68rem;
-      padding: 3px 8px; cursor: pointer; transition: background 0.15s;
-    }
-    .new-btn:hover { background: var(--purple); }
-
-    .note-list {
-      overflow-y: auto; flex: 1;
-    }
-
-    .note-item {
-      padding: 10px 12px;
-      border-bottom: 1px dotted rgba(219,103,167,0.4);
-      cursor: pointer; transition: background 0.12s;
-      display: flex; flex-direction: column; gap: 3px;
-    }
-    .note-item:hover { background: rgba(255,255,255,0.3); }
-    .note-item.active { background: rgba(255,255,255,0.6); border-left: 3px solid var(--pink); padding-left: 9px; }
-
-    .note-item-title {
-      font-size: 0.82rem; color: var(--text);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      font-weight: bold;
-    }
-    .note-item-preview {
-      font-size: 0.68rem; color: var(--muted); font-family: monospace;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .note-item-date {
-      font-size: 0.62rem; color: var(--muted); font-family: monospace;
-    }
-
-    .empty-sidebar {
-      padding: 24px 12px; text-align: center;
-      font-size: 0.75rem; color: var(--muted); font-style: italic; line-height: 1.9;
-    }
-
-    /* ── EDITOR PANE ── */
-    .editor-pane {
-      flex: 1; display: flex; flex-direction: column; overflow: hidden;
-      background: var(--panel);
-    }
-
-    .editor-bar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 8px 14px; gap: 10px;
-      border-bottom: 1px dotted var(--border-dot);
-      background: rgba(255,255,255,0.3); flex-shrink: 0;
-    }
-
-    .note-title-input {
-      flex: 1; background: transparent; border: none;
-      color: var(--text); font-family: Georgia, serif;
-      font-size: 0.95rem; font-weight: bold;
-      outline: none; padding: 0;
-    }
-    .note-title-input::placeholder { color: var(--muted); font-weight: normal; }
-
-    .editor-meta {
-      font-family: monospace; font-size: 0.62rem; color: var(--muted);
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); font-family: 'Courier New', monospace;
+      font-size: 0.72rem; padding: 2px 6px; cursor: pointer;
       white-space: nowrap; flex-shrink: 0;
     }
+    .new-btn:hover { color: var(--text); border-color: var(--dim); }
 
-    .del-btn {
-      background: transparent; border: 1px solid rgba(192,0,58,0.35);
-      border-radius: 3px; color: #c0003a;
-      font-family: monospace; font-size: 0.65rem;
-      padding: 3px 8px; cursor: pointer; transition: all 0.15s; flex-shrink: 0;
+    /* ── NOTE LIST ── */
+    .note-list { overflow-y: auto; flex: 1; }
+
+    /* ── NOTE ITEM (wide) ── */
+    .note-item {
+      display: flex; align-items: flex-start; gap: 7px;
+      padding: 9px 8px;
+      border-bottom: 1px solid var(--bg3);
+      cursor: pointer;
+      overflow: hidden;
     }
-    .del-btn:hover { background: #c0003a; color: #fff; }
+    .note-item:hover { background: var(--bg3); }
+    .note-item.active {
+      background: var(--bg3);
+      border-left: 2px solid var(--text);
+      padding-left: 6px;
+    }
+
+    /* The first-letter icon — always visible */
+    .note-icon {
+      flex-shrink: 0;
+      width: 16px; height: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; color: var(--dim);
+      border: 1px solid var(--dim);
+      line-height: 1;
+      margin-top: 1px;
+      text-transform: uppercase;
+      user-select: none;
+    }
+    .note-item.active .note-icon { color: var(--text); border-color: var(--text); }
+
+    /* Text block — hidden when narrow */
+    .note-text { overflow: hidden; flex: 1; }
+    .note-item-title {
+      font-size: 0.8rem; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .note-item-preview {
+      font-size: 0.66rem; color: var(--muted);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+    .note-item-date { font-size: 0.6rem; color: var(--dim); margin-top: 2px; }
+
+    /* narrow: center icon, hide text, equalise padding */
+    .sidebar.narrow .note-item {
+      justify-content: center;
+      padding: 10px 0;
+      gap: 0;
+    }
+    .sidebar.narrow .note-text { display: none; }
+
+    .empty-sidebar {
+      padding: 20px 10px; text-align: center;
+      font-size: 0.72rem; color: var(--muted); line-height: 1.9;
+    }
+    .sidebar.narrow .empty-sidebar { font-size: 0; }  /* hide text when tiny */
+    .sidebar.narrow .empty-sidebar::after {
+      content: '·'; font-size: 0.8rem; color: var(--dim);
+    }
+
+    /* ── EDITOR ── */
+    .editor-pane {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; background: var(--bg);
+    }
+    .editor-bar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 14px; border-bottom: 1px solid var(--border);
+      background: var(--bg2); flex-shrink: 0;
+    }
+    .note-title-input {
+      flex: 1; background: transparent; border: none;
+      color: var(--text); font-family: 'Courier New', monospace;
+      font-size: 0.88rem; outline: none; padding: 0;
+    }
+    .note-title-input::placeholder { color: var(--dim); }
+    .editor-meta { font-size: 0.66rem; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+    .del-btn {
+      background: transparent; border: none;
+      color: var(--dim); font-family: 'Courier New', monospace;
+      font-size: 0.66rem; padding: 2px 4px; cursor: pointer; flex-shrink: 0;
+    }
+    .del-btn:hover { color: var(--text); }
 
     .note-body {
       flex: 1; resize: none; border: none; outline: none;
-      background: transparent;
-      color: var(--text); font-family: monospace;
-      font-size: 0.88rem; line-height: 1.75;
-      padding: 18px 20px;
-      overflow-y: auto;
+      background: var(--bg); color: var(--text);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9rem; line-height: 1.7;
+      padding: 20px 22px; overflow-y: auto;
+      caret-color: var(--text);
     }
-    .note-body::placeholder { color: var(--muted); font-style: italic; }
+    .note-body::placeholder { color: var(--dim); }
 
     .editor-empty {
-      flex: 1; display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 10px;
-      color: var(--muted); font-style: italic; font-size: 0.82rem; text-align: center;
+      flex: 1; display: flex; align-items: center;
+      justify-content: center; color: var(--dim); font-size: 0.8rem;
     }
 
     /* ── FOOTER ── */
     footer {
-      text-align: center; padding: 10px;
-      border-top: 1px dotted var(--border-dot);
-      font-style: italic; font-size: 0.75rem; color: rgb(144,112,112);
-      flex-shrink: 0;
+      text-align: center; padding: 8px;
+      border-top: 1px solid var(--border);
+      font-size: 0.7rem; color: var(--dim); flex-shrink: 0;
     }
 
-    /* ── MOBILE ── */
-    @media (max-width: 600px) {
-      .sidebar { width: 160px; }
-      .note-body { font-size: 0.82rem; padding: 12px; }
-    }
+    @media (max-width: 600px) { .note-body { padding: 12px; } }
 
-    /* ── ANIMATIONS ── */
-    @keyframes popIn {
-      from { opacity: 0; transform: scale(.97) translateY(5px); }
-      to   { opacity: 1; transform: scale(1) translateY(0); }
-    }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
-
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.2} }
     ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border-dot); border-radius: 3px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
   </style>
 </head>
 <body>
@@ -244,13 +273,13 @@
 <!-- ══════════════════════════════ AUTH ══════════════════════════════ -->
 <div class="overlay" id="authOverlay">
   <div class="auth-box">
-    <div class="auth-logo">zee's notes <span>:)</span></div>
+    <div class="auth-logo">zee's notes</div>
     <div class="auth-sub">enter password to continue</div>
     <div class="field">
-      <label class="lbl">access key</label>
-      <input type="password" id="authInput" placeholder="password" autocomplete="current-password" />
+      <label class="lbl">password</label>
+      <input type="password" id="authInput" placeholder="..." autocomplete="current-password" />
     </div>
-    <button class="btn btn-primary" onclick="submitAuth()">unlock →</button>
+    <button class="btn-primary" onclick="submitAuth()">unlock</button>
     <div class="err" id="authErr"></div>
   </div>
 </div>
@@ -277,46 +306,45 @@
     <div class="sdot" id="sdot"></div>
     <span id="slbl">synced</span>
   </div>
-  <button class="tbtn-sm" onclick="syncNow()">↑↓ sync</button>
+  <button class="tbtn-sm" onclick="syncNow()">sync</button>
 </div>
 
 <!-- ══════════════════════════════ APP ══════════════════════════════ -->
 <div class="app">
 
-  <!-- SIDEBAR -->
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
+    <div class="resize-handle" id="resizeHandle"></div>
+
     <div class="sidebar-hdr">
       <span class="sidebar-hdr-label">notes</span>
-      <button class="new-btn" onclick="newNote()">+ new</button>
+      <button class="new-btn" id="newBtn" onclick="newNote()" title="new note">+</button>
     </div>
+
     <div class="note-list" id="noteList"></div>
   </div>
 
-  <!-- EDITOR -->
   <div class="editor-pane" id="editorPane">
-    <div class="editor-empty" id="editorEmpty">
-      <span>← select a note,</span>
-      <span>or create a new one</span>
-    </div>
+    <div class="editor-empty">select a note or create one</div>
   </div>
 
 </div>
 
 <!-- ══════════════════════════════ FOOTER ══════════════════════════════ -->
-<footer>
-  <em>"A man's reach should exceed his grasp...else, what's the heavens for?"</em>
-</footer>
+<footer>"A man's reach should exceed his grasp...else, what's the heavens for?"</footer>
 
 <script>
 // ════════════════════════════════════════════════════════
-//  NOTES  ·  Simple scratchpad synced to GitHub Gist
-//  Uses the same tc_hash / tc_pat / tc_gist as tasks.html
-//  Data file: notes_data.json  (separate from tasks)
+//  NOTES — same tc_hash / tc_pat / tc_gist as tasks.html
+//  Data file: notes_data.json (separate from tasks)
 // ════════════════════════════════════════════════════════
 
 const FILE  = 'notes_data.json';
-let notes   = [];          // array of { id, title, body, createdAt, updatedAt }
-let current = null;        // id of open note
+const SW_KEY = 'notes_sw';          // localStorage key for sidebar width
+const NARROW  = 80;                 // px threshold for narrow mode
+const DEFAULT_W = 44;               // default sidebar width (collapsed)
+
+let notes   = [];
+let current = null;
 let saveTimer = null;
 
 const $ = id => document.getElementById(id);
@@ -327,6 +355,56 @@ async function sha256(msg) {
   return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,'0')).join('');
 }
 
+// ── sidebar resize ────────────────────────────────────
+(function initResize() {
+  const sidebar = $('sidebar');
+  const handle  = $('resizeHandle');
+
+  // restore saved or default width
+  const saved = parseInt(localStorage.getItem(SW_KEY)) || DEFAULT_W;
+  setSidebarWidth(saved);
+
+  let dragging = false, startX = 0, startW = 0;
+
+  handle.addEventListener('mousedown', e => {
+    dragging = true;
+    startX   = e.clientX;
+    startW   = sidebar.offsetWidth;
+    handle.classList.add('dragging');
+    document.body.style.cursor    = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const w = Math.max(32, Math.min(400, startW + e.clientX - startX));
+    setSidebarWidth(w);
+    localStorage.setItem(SW_KEY, w);
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor    = '';
+    document.body.style.userSelect = '';
+  });
+
+  // double-click handle: toggle between collapsed and 180px
+  handle.addEventListener('dblclick', () => {
+    const w = sidebar.offsetWidth < NARROW ? 180 : DEFAULT_W;
+    setSidebarWidth(w);
+    localStorage.setItem(SW_KEY, w);
+  });
+})();
+
+function setSidebarWidth(w) {
+  const sidebar = $('sidebar');
+  sidebar.style.width = w + 'px';
+  sidebar.classList.toggle('narrow', w < NARROW);
+}
+
 // ── boot ─────────────────────────────────────────────
 function boot() {
   const hash = localStorage.getItem('tc_hash');
@@ -334,22 +412,16 @@ function boot() {
   const gist = localStorage.getItem('tc_gist');
 
   if (!hash || !pat || !gist) {
-    // No credentials at all — direct them to tasks.html for first-time setup
-    $('authErr').textContent = '';
-    $('authOverlay').classList.remove('hidden');
     const sub = $('authOverlay').querySelector('.auth-sub');
-    if (!hash) {
-      sub.textContent = 'please complete setup on tasks.html first';
-      $('authOverlay').querySelector('input').style.display = 'none';
-      $('authOverlay').querySelector('.btn-primary').style.display = 'none';
-      const link = document.createElement('a');
-      link.href = 'tasks.html'; link.textContent = '→ go to tasks.html';
-      link.style.cssText = 'display:block;text-align:center;margin-top:14px;color:var(--pink);font-size:0.9rem';
-      $('authOverlay').querySelector('.auth-box').appendChild(link);
-    }
-    return;
+    sub.textContent = 'please complete setup on tasks.html first';
+    $('authOverlay').querySelector('input').style.display = 'none';
+    $('authOverlay').querySelector('.btn-primary').style.display = 'none';
+    const link = document.createElement('a');
+    link.href = 'tasks.html';
+    link.textContent = '→ go to tasks.html';
+    link.style.cssText = 'display:block;margin-top:14px;color:var(--text);font-size:0.85rem';
+    $('authOverlay').querySelector('.auth-box').appendChild(link);
   }
-  // Credentials exist — just ask for password
 }
 
 // ── auth ─────────────────────────────────────────────
@@ -384,17 +456,17 @@ async function syncNow() {
   const pat = localStorage.getItem('tc_pat');
   const id  = localStorage.getItem('tc_gist');
   if (!pat || !id) return;
-  setSyncState('syncing', 'syncing…');
+  setSyncState('syncing', 'syncing...');
   try {
     const r = await fetch(`https://api.github.com/gists/${id}`, {
       headers: { 'Authorization': `Bearer ${pat}`, 'X-GitHub-Api-Version': '2022-11-28' }
     });
     if (!r.ok) throw new Error(r.status);
-    const data  = await r.json();
-    const raw   = data.files[FILE]?.content;
+    const data = await r.json();
+    const raw  = data.files[FILE]?.content;
     if (raw) notes = JSON.parse(raw);
     renderList();
-    if (current) openNote(current, false);   // refresh open note from remote
+    if (current) openNote(current, false);
     setSyncState('ok', `synced ${new Date().toLocaleTimeString()}`);
   } catch(e) { setSyncState('error', 'sync error'); }
 }
@@ -403,7 +475,7 @@ async function pushGist() {
   const pat = localStorage.getItem('tc_pat');
   const id  = localStorage.getItem('tc_gist');
   if (!pat || !id) return;
-  setSyncState('syncing', 'saving…');
+  setSyncState('syncing', 'saving...');
   try {
     await fetch(`https://api.github.com/gists/${id}`, {
       method: 'PATCH',
@@ -415,23 +487,34 @@ async function pushGist() {
 }
 
 // ── render sidebar ────────────────────────────────────
+function noteIcon(note) {
+  // first non-whitespace character of title, or · if untitled
+  const ch = (note.title || '').trim()[0];
+  return ch ? ch.toUpperCase() : '·';
+}
+
 function renderList() {
   const list = $('noteList');
   if (notes.length === 0) {
-    list.innerHTML = `<div class="empty-sidebar">no notes yet.<br>hit "+ new" to start.</div>`;
+    list.innerHTML = `<div class="empty-sidebar">no notes yet.<br>hit + to start.</div>`;
     return;
   }
-  // most-recently-updated first
   const sorted = [...notes].sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
   list.innerHTML = sorted.map(n => {
     const preview = (n.body || '').replace(/\n/g,' ').slice(0, 48);
     const when    = fmtDate(n.updatedAt);
-    const isCurr  = n.id === current;
+    const icon    = noteIcon(n);
+    const label   = escHtml(n.title || 'untitled');
     return `
-    <div class="note-item ${isCurr ? 'active' : ''}" onclick="openNote('${n.id}')">
-      <div class="note-item-title">${escHtml(n.title || 'untitled')}</div>
-      ${preview ? `<div class="note-item-preview">${escHtml(preview)}</div>` : ''}
-      <div class="note-item-date">${when}</div>
+    <div class="note-item ${n.id === current ? 'active' : ''}"
+         onclick="openNote('${n.id}')"
+         title="${escAttr(n.title || 'untitled')}">
+      <span class="note-icon">${escHtml(icon)}</span>
+      <div class="note-text">
+        <div class="note-item-title">${label}</div>
+        ${preview ? `<div class="note-item-preview">${escHtml(preview)}</div>` : ''}
+        <div class="note-item-date">${when}</div>
+      </div>
     </div>`;
   }).join('');
 }
@@ -443,18 +526,17 @@ function openNote(id, rerender = true) {
   current = id;
   if (rerender) renderList();
 
-  const pane = $('editorPane');
-  pane.innerHTML = `
+  $('editorPane').innerHTML = `
     <div class="editor-bar">
       <input class="note-title-input" id="noteTitle"
              value="${escAttr(note.title)}"
              placeholder="untitled"
              oninput="onTitleChange()" />
       <span class="editor-meta" id="editorMeta">${fmtDate(note.updatedAt)}</span>
-      <button class="del-btn" onclick="deleteNote('${note.id}')">delete</button>
+      <button class="del-btn" onclick="deleteNote('${note.id}')">[x]</button>
     </div>
     <textarea class="note-body" id="noteBody"
-              placeholder="start typing…"
+              placeholder="start typing..."
               spellcheck="true"
               oninput="onBodyChange()">${escHtml(note.body || '')}</textarea>
   `;
@@ -464,9 +546,7 @@ function openNote(id, rerender = true) {
 // ── new note ──────────────────────────────────────────
 function newNote() {
   const note = {
-    id:        uid(),
-    title:     '',
-    body:      '',
+    id: uid(), title: '', body: '',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -477,14 +557,10 @@ function newNote() {
 
 // ── delete note ───────────────────────────────────────
 function deleteNote(id) {
-  if (!confirm('Delete this note?')) return;
+  if (!confirm('delete this note?')) return;
   notes = notes.filter(n => n.id !== id);
   current = null;
-  $('editorPane').innerHTML = `
-    <div class="editor-empty">
-      <span>← select a note,</span>
-      <span>or create a new one</span>
-    </div>`;
+  $('editorPane').innerHTML = `<div class="editor-empty">select a note or create one</div>`;
   renderList();
   pushGist();
 }
@@ -504,20 +580,16 @@ function onBodyChange() {
   if (!note) return;
   note.body      = $('noteBody').value;
   note.updatedAt = new Date().toISOString();
-  updateMeta();
-  scheduleSave();
-}
-
-function updateMeta() {
   const el = $('editorMeta');
-  if (el) el.textContent = 'saving…';
+  if (el) el.textContent = 'saving...';
+  scheduleSave();
 }
 
 function scheduleSave() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
     await pushGist();
-    const el = $('editorMeta');
+    const el   = $('editorMeta');
     const note = notes.find(n => n.id === current);
     if (el && note) el.textContent = fmtDate(note.updatedAt);
   }, 1200);
@@ -527,23 +599,19 @@ function scheduleSave() {
 function fmtDate(iso) {
   if (!iso) return '';
   const d = new Date(iso);
-  const today = new Date();
-  const isToday = d.toDateString() === today.toDateString();
+  const isToday = d.toDateString() === new Date().toDateString();
   if (isToday) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
-
 function escHtml(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-
 function escAttr(s) {
-  return String(s || '').replace(/"/g,'&quot;');
+  return String(s||'').replace(/"/g,'&quot;');
 }
 
 // ── keyboard ──────────────────────────────────────────
 document.addEventListener('keydown', e => {
-  // Cmd/Ctrl+S → force save now
   if ((e.metaKey || e.ctrlKey) && e.key === 's') {
     e.preventDefault();
     clearTimeout(saveTimer);
